@@ -22,7 +22,7 @@ export class BolComOrders implements INodeType {
       },
     ],
     requestDefaults: {
-      baseURL: 'https://api.bol.com/',
+      baseURL: 'https://api.bol.com/retailer',
       headers: {
         'Accept': 'application/vnd.retailer.v10+json',
         'Content-Type': 'application/json',

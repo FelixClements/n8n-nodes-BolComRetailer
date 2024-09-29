@@ -22,7 +22,7 @@ export const bolcomShipmentsResourceOperations: INodeProperties[] = [
         routing: {
           request: {
             method: 'POST',
-            url: '/retailer/shipments',
+            url: '/shipments',
             body: {
               shipmentRequest: '={{ $parameter["shipmentRequest"] }}',
             },
@@ -40,7 +40,7 @@ export const bolcomShipmentsResourceOperations: INodeProperties[] = [
         routing: {
           request: {
             method: 'POST',
-            url: '/retailer/shipping-labels',
+            url: '/shipping-labels',
             body: {
               shippingLabelRequest: '={{ $parameter["shippingLabelRequest"] }}',
             },
@@ -58,7 +58,7 @@ export const bolcomShipmentsResourceOperations: INodeProperties[] = [
         routing: {
           request: {
             method: 'GET',
-            url: '=/retailer/shipments/{{$parameter["shipmentId"]}}',
+            url: '=/shipments/{{$parameter["shipmentId"]}}',
             headers: {
               Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
             },
@@ -73,7 +73,7 @@ export const bolcomShipmentsResourceOperations: INodeProperties[] = [
         routing: {
           request: {
             method: 'GET',
-            url: '/retailer/shipments',
+            url: '/shipments',
             qs: {
               page: '={{ $parameter["page"] || 1 }}', // default page is 1
               fulfilmentMethod: '={{ $parameter["fulfilmentMethod"] }}',
@@ -92,7 +92,7 @@ export const bolcomShipmentsResourceOperations: INodeProperties[] = [
         routing: {
           request: {
             method: 'GET',
-            url: '=/retailer/shipping-labels/{{$parameter["shippingLabelId"]}}',
+            url: '=/shipping-labels/{{$parameter["shippingLabelId"]}}',
             headers: {
               Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
             },

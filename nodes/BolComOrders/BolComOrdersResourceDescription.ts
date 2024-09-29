@@ -22,7 +22,7 @@ export const bolcomOrdersResourceOperations: INodeProperties[] = [
         routing: {
           request: {
             method: 'GET',
-            url: '/retailer/orders',
+            url: '/orders',
             qs: {
               page: '={{ $parameter["page"] || 1 }}',
               fulfilmentMethod: '={{ $parameter["fulfilmentMethod"] }}'
@@ -41,7 +41,7 @@ export const bolcomOrdersResourceOperations: INodeProperties[] = [
         routing: {
           request: {
             method: 'GET',
-            url: '=/retailer/orders/{{$parameter["orderId"]}}',
+            url: '=/orders/{{$parameter["orderId"]}}',
             headers: {
               Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
             },
@@ -56,7 +56,7 @@ export const bolcomOrdersResourceOperations: INodeProperties[] = [
         routing: {
           request: {
             method: 'PUT',
-            url: '=/retailer/orders/{{$parameter["orderId"]}}/items/{{$parameter["orderItemId"]}}/cancellation',
+            url: '=/orders/{{$parameter["orderId"]}}/items/{{$parameter["orderItemId"]}}/cancellation',
             body: {
               cancellationReason: '={{ $parameter["cancellationReason"] }}',
             },
