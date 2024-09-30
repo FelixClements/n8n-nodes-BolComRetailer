@@ -1,7 +1,7 @@
 import { INodeProperties } from "n8n-workflow";
 
 // Defining operations for the Shipments resource
-export const bolcomShipmentsOperations: INodeProperties[] = [
+export const bolcomShipmentsResourceOperations: INodeProperties[] = [
   {
     displayName: 'Operation',
     name: 'operation',
@@ -47,6 +47,25 @@ export const bolcomShipmentsOperations: INodeProperties[] = [
           },
         },
         action: 'Create a new shipment',
+      },
+			{
+        name: 'Get Invoice Requests',
+        value: 'getInvoicerequests',
+        description: 'Retrieve a paginated list of Invoice Requests',
+        routing: {
+          request: {
+            method: 'GET',
+            url: '/shipments/invoices/requests',
+            qs: {
+              page: '={{ $parameter["page"] }}',
+              state: '={{ $parameter["state"] }}',
+            },
+            headers: {
+              'Authorization': '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}'
+            },
+          },
+        },
+        action: 'Retrieve a list of invoice requests',
       },
       {
         name: 'Get Shipment',
@@ -108,7 +127,7 @@ export const bolcomShipmentsOperations: INodeProperties[] = [
 
 
 // Defining fields for each operation
-export const bolcomShipmentsFields: INodeProperties[] = [
+export const bolcomShipmentsResourceFields: INodeProperties[] = [
   /* -------------------------------------------------------------------------- */
   /*                                createShipment                               */
   /* -------------------------------------------------------------------------- */
@@ -167,7 +186,7 @@ export const bolcomShipmentsFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['shipments'],
-        operation: ['getShipments'],
+        operation: ['getShipments','getInvoicerequests'],
       },
     },
   },
@@ -223,7 +242,7 @@ export const bolcomShipmentsFields: INodeProperties[] = [
     },
   },
   /* -------------------------------------------------------------------------- */
-  /*                            uploadInvoiceForShipment                         */
+  /*                            InvoiceForShipment                              */
   /* -------------------------------------------------------------------------- */
   {
     displayName: 'Shipment ID',
@@ -253,6 +272,24 @@ export const bolcomShipmentsFields: INodeProperties[] = [
       show: {
         resource: ['shipments'],
         operation: ['uploadInvoiceForShipment'],
+      },
+    },
+  },
+	{
+    displayName: 'Invoice Status',
+    name: 'state',
+    type: 'options',
+    options: [
+      { name: 'OPEN', value: 'OPEN' },
+      { name: 'UPLOAD_ERROR', value: 'UPLOAD_ERROR' },
+			{ name: 'ALL', value: 'ALL' },
+    ],
+    default: 'OPEN',
+    description: 'To filter on invoice request state',
+    displayOptions: {
+      show: {
+        resource: ['shipments'],
+        operation: ['getInvoicerequests'],
       },
     },
   },
