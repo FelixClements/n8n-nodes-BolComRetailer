@@ -24,13 +24,23 @@ export const bolcomOrdersResourceOperations: INodeProperties[] = [
             method: 'GET',
             url: '/orders',
             qs: {
-              page: '={{ $parameter["page"] || 1 }}',
-              fulfilmentMethod: '={{ $parameter["fulfilmentMethod"] }}'
+							fulfilmentMethod: '={{ $parameter["fulfilmentMethod"] }}',
+							page: '={{ $parameter["page"] || 1 }}'
 						},
             headers: {
               Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
             },
           },
+					output: {
+						postReceive: [
+							{
+								type: 'set',
+								properties: {
+								value: '={{ { $response } }}'
+								}
+							}
+						]
+				  }
         },
         action: 'Fetch list of orders',
       },
