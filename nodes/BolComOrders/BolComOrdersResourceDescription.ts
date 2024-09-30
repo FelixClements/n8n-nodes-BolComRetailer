@@ -31,16 +31,6 @@ export const bolcomOrdersResourceOperations: INodeProperties[] = [
               Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
             },
           },
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-								value: '={{ { $response } }}'
-								}
-							}
-						]
-				  }
         },
         action: 'Fetch list of orders',
       },
@@ -59,24 +49,29 @@ export const bolcomOrdersResourceOperations: INodeProperties[] = [
         },
         action: 'Fetch details of a specific order by ID',
       },
-      {
-        name: 'Cancel Order Item',
-        value: 'cancelOrderItem',
-        description: 'Cancel a specific order item by its ID',
-        routing: {
-          request: {
-            method: 'PUT',
-            url: '=/orders/{{$parameter["orderId"]}}/items/{{$parameter["orderItemId"]}}/cancellation',
-            body: {
-              cancellationReason: '={{ $parameter["cancellationReason"] }}',
-            },
-            headers: {
-              Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
-            },
-          },
-        },
-        action: 'Cancel a specific order item',
-      },
+			{
+				name: 'Cancel Order Item',
+				value: 'cancelOrderItem',
+				description: 'Cancel a specific order item by its ID',
+				routing: {
+					request: {
+						method: 'PUT',
+						url: '=/orders/cancellation',
+						body: {
+							orderItems: [
+								{
+									orderItemId: '={{$parameter["orderItemId"]}}',          // Dynamically map orderItemId
+									reasonCode: '={{$parameter["cancellationReason"]}}'     // Dynamically map cancellationReason
+								}
+							]
+						},
+						headers: {
+							Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
+						},
+					},
+				},
+				action: 'Cancel a specific order item',
+			}
     ],
     default: 'getOrders',
   },
@@ -84,7 +79,7 @@ export const bolcomOrdersResourceOperations: INodeProperties[] = [
 
 export const bolcomOrdersResourceFields: INodeProperties[] = [
   /* -------------------------------------------------------------------------- */
-  /*           Fields for "Get Orders" operation (pagination & filters)          */
+  /*           Fields for "Get Orders" operation (pagination & filters)         */
   /* -------------------------------------------------------------------------- */
   {
     displayName: 'Page',
@@ -137,7 +132,7 @@ export const bolcomOrdersResourceFields: INodeProperties[] = [
   },
 
   /* -------------------------------------------------------------------------- */
-  /*           Field for "Cancel Order Item" operation                           */
+  /*           Field for "Cancel Order Item" operation                          */
   /* -------------------------------------------------------------------------- */
   {
     displayName: 'Order ID',

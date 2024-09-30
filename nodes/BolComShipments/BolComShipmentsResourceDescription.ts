@@ -2,7 +2,7 @@ import { INodeProperties } from 'n8n-workflow';
 
 export const bolcomShipmentsResourceOperations: INodeProperties[] = [
   /* -------------------------------------------------------------------------- */
-  /*                                Shipments Operations                         */
+  /*                                Shipments Operations                        */
   /* -------------------------------------------------------------------------- */
   {
     displayName: 'Operation',
