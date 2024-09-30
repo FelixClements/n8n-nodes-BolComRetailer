@@ -1,9 +1,7 @@
-import { INodeProperties } from 'n8n-workflow';
+import { INodeProperties } from "n8n-workflow";
 
-export const bolcomShipmentsResourceOperations: INodeProperties[] = [
-  /* -------------------------------------------------------------------------- */
-  /*                                Shipments Operations                        */
-  /* -------------------------------------------------------------------------- */
+// Defining operations for the Shipments resource
+export const bolcomShipmentsOperations: INodeProperties[] = [
   {
     displayName: 'Operation',
     name: 'operation',
@@ -16,97 +14,183 @@ export const bolcomShipmentsResourceOperations: INodeProperties[] = [
     },
     options: [
       {
+        name: 'Cancel Shipment',
+        value: 'cancelShipment',
+        description: 'Cancel a shipment by shipment ID',
+        routing: {
+          request: {
+            method: 'DELETE',
+            url: '=/shipments/{{$parameter["shipmentId"]}}',
+            headers: {
+              'Authorization': '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}'
+            },
+          },
+        },
+        action: 'Cancel a shipment',
+      },
+      {
         name: 'Create Shipment',
         value: 'createShipment',
-        description: 'Create a shipment for an order',
+        description: 'Create a shipment for one or more order items',
         routing: {
           request: {
             method: 'POST',
             url: '/shipments',
             body: {
-              shipmentRequest: '={{ $parameter["shipmentRequest"] }}',
+              orderId: '={{ $parameter["orderId"] }}',
+              transporterCode: '={{ $parameter["transporterCode"] }}',
+              trackAndTraceCode: '={{ $parameter["trackAndTraceCode"] }}',
             },
             headers: {
-              Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
+              'Authorization': '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}'
             },
           },
         },
-        action: 'Create a shipment',
+        action: 'Create a new shipment',
       },
       {
-        name: 'Create Shipping Label',
-        value: 'createShippingLabel',
-        description: 'Generate a shipping label for a shipment',
-        routing: {
-          request: {
-            method: 'POST',
-            url: '/shipping-labels',
-            body: {
-              shippingLabelRequest: '={{ $parameter["shippingLabelRequest"] }}',
-            },
-            headers: {
-              Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
-            },
-          },
-        },
-        action: 'Create a shipping label',
-      },
-      {
-        name: 'Get Shipment by ID',
-        value: 'getShipmentById',
-        description: 'Retrieve shipment details by shipment ID',
+        name: 'Get Shipment',
+        value: 'getShipment',
+        description: 'Retrieve a shipment by its shipment ID',
         routing: {
           request: {
             method: 'GET',
             url: '=/shipments/{{$parameter["shipmentId"]}}',
             headers: {
-              Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
+              'Authorization': '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}'
             },
           },
         },
-        action: 'Get shipment by ID',
+        action: 'Retrieve a shipment by its ID',
       },
       {
-        name: 'Get Shipment List',
-        value: 'getShipmentList',
-        description: 'Retrieve a list of all shipments (paginated)',
+        name: 'Get Shipments',
+        value: 'getShipments',
+        description: 'Retrieve a paginated list of shipments',
         routing: {
           request: {
             method: 'GET',
             url: '/shipments',
             qs: {
-              page: '={{ $parameter["page"] || 1 }}', // default page is 1
+              page: '={{ $parameter["page"] }}',
               fulfilmentMethod: '={{ $parameter["fulfilmentMethod"] }}',
             },
             headers: {
-              Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
+              'Authorization': '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}'
             },
           },
         },
-        action: 'Get shipment list paginated',
+        action: 'Retrieve a list of shipments',
       },
       {
-        name: 'Get Shipping Label by ID',
-        value: 'getShippingLabelById',
-        description: 'Get a shipping label by its ID',
+        name: 'Upload Invoice for Shipment',
+        value: 'uploadInvoiceForShipment',
+        description: 'Upload an invoice for the specified shipment by shipment ID',
         routing: {
           request: {
-            method: 'GET',
-            url: '=/shipping-labels/{{$parameter["shippingLabelId"]}}',
+            method: 'POST',
+            url: '=/shipments/invoices/{{$parameter["shipmentId"]}}',
+            body: {
+              invoice: '={{ $parameter["invoice"] }}',
+            },
             headers: {
-              Authorization: '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
+              'Authorization': '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}',
+              'Content-Type': 'application/json',
             },
           },
         },
-        action: 'Get a shipping label by ID',
+        action: 'Upload invoice for a shipment',
       },
     ],
-    default: 'getShipmentById',
+    default: 'createShipment',
   },
 ];
 
-export const bolcomShipmentsResourceFields: INodeProperties[] = [
-  // Fields for "Get Shipment by ID"
+
+// Defining fields for each operation
+export const bolcomShipmentsFields: INodeProperties[] = [
+  /* -------------------------------------------------------------------------- */
+  /*                                createShipment                               */
+  /* -------------------------------------------------------------------------- */
+  {
+    displayName: 'Order ID',
+    name: 'orderId',
+    type: 'string',
+    default: '',
+    description: 'The ID of the order for which to create a shipment',
+    required: true,
+    displayOptions: {
+      show: {
+        resource: ['shipments'],
+        operation: ['createShipment'],
+      },
+    },
+  },
+  {
+    displayName: 'Transporter Code',
+    name: 'transporterCode',
+    type: 'string',
+    default: '',
+    description: 'The code of the transporter (only required if shipping without a purchased label)',
+    displayOptions: {
+      show: {
+        resource: ['shipments'],
+        operation: ['createShipment'],
+      },
+    },
+  },
+  {
+    displayName: 'Track and Trace Code',
+    name: 'trackAndTraceCode',
+    type: 'string',
+    default: '',
+    description: 'The track and trace code provided by the transporter',
+    displayOptions: {
+      show: {
+        resource: ['shipments'],
+        operation: ['createShipment'],
+      },
+    },
+  },
+  /* -------------------------------------------------------------------------- */
+  /*                                getShipments                                 */
+  /* -------------------------------------------------------------------------- */
+  {
+    displayName: 'Page',
+    name: 'page',
+    type: 'number',
+    typeOptions: {
+      minValue: 1,
+    },
+    default: 1,
+    description: 'The page to get with a page size of 50',
+    displayOptions: {
+      show: {
+        resource: ['shipments'],
+        operation: ['getShipments'],
+      },
+    },
+  },
+  {
+    displayName: 'Fulfilment Method',
+    name: 'fulfilmentMethod',
+    type: 'options',
+    options: [
+      { name: 'FBR (Fulfilled by Retailer)', value: 'FBR' },
+      { name: 'FBB (Fulfilled by Bol.com)', value: 'FBB' },
+    ],
+    default: 'FBR',
+    description: 'The fulfilment method for the shipments',
+    displayOptions: {
+      show: {
+        resource: ['shipments'],
+        operation: ['getShipments'],
+      },
+    },
+  },
+  /* -------------------------------------------------------------------------- */
+  /*                                getShipment                                  */
+  /* -------------------------------------------------------------------------- */
   {
     displayName: 'Shipment ID',
     name: 'shipmentId',
@@ -117,94 +201,60 @@ export const bolcomShipmentsResourceFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['shipments'],
-        operation: ['getShipmentById'],
+        operation: ['getShipment'],
       },
     },
   },
-
-  // Fields for "Create Shipment"
+  /* -------------------------------------------------------------------------- */
+  /*                                cancelShipment                               */
+  /* -------------------------------------------------------------------------- */
   {
-    displayName: 'Shipment Request Body',
-    name: 'shipmentRequest',
-    type: 'json',
-    default: '',
-    description: 'A JSON object representing the shipment request body',
-    required: true,
-    displayOptions: {
-      show: {
-        resource: ['shipments'],
-        operation: ['createShipment'],
-      },
-    },
-  },
-
-  // Fields for "Get Shipment List"
-  {
-    displayName: 'Page',
-    name: 'page',
-    type: 'number',
-    default: 1,
-    description: 'The page of shipments to retrieve. Default is page 1.',
-    displayOptions: {
-      show: {
-        resource: ['shipments'],
-        operation: ['getShipmentList'],
-      },
-    },
-  },
-  {
-    displayName: 'Fulfilment Method',
-    name: 'fulfilmentMethod',
-    type: 'options',
-    options: [
-      {
-        name: 'FBR (Fulfilled by Retailer)',
-        value: 'FBR',
-      },
-      {
-        name: 'FBB (Fulfilled by Bol.com)',
-        value: 'FBB',
-      },
-    ],
-    default: 'FBR',
-    description: 'The fulfilment method to filter the results. Either FBR (retailer) or FBB (bol.com).',
-    displayOptions: {
-      show: {
-        resource: ['shipments'],
-        operation: ['getShipmentList'],
-      },
-    },
-  },
-
-  // Fields for "Create Shipping Label"
-  {
-    displayName: 'Shipping Label Request Body',
-    name: 'shippingLabelRequest',
-    type: 'json',
-    default: '',
-    description: 'A JSON object representing the shipping label request body',
-    required: true,
-    displayOptions: {
-      show: {
-        resource: ['shipments'],
-        operation: ['createShippingLabel'],
-      },
-    },
-  },
-
-  // Fields for "Get Shipping Label by ID"
-  {
-    displayName: 'Shipping Label ID',
-    name: 'shippingLabelId',
+    displayName: 'Shipment ID',
+    name: 'shipmentId',
     type: 'string',
     default: '',
-    description: 'The ID of the shipping label to retrieve',
+    description: 'The ID of the shipment to cancel',
     required: true,
     displayOptions: {
       show: {
         resource: ['shipments'],
-        operation: ['getShippingLabelById'],
+        operation: ['cancelShipment'],
+      },
+    },
+  },
+  /* -------------------------------------------------------------------------- */
+  /*                            uploadInvoiceForShipment                         */
+  /* -------------------------------------------------------------------------- */
+  {
+    displayName: 'Shipment ID',
+    name: 'shipmentId',
+    type: 'string',
+    default: '',
+    description: 'The ID of the shipment associated with the invoice',
+    required: true,
+    displayOptions: {
+      show: {
+        resource: ['shipments'],
+        operation: ['uploadInvoiceForShipment'],
+      },
+    },
+  },
+  {
+    displayName: 'Invoice',
+    name: 'invoice',
+    type: 'string',
+    default: '',
+    description: 'The invoice file to upload (binary format)',
+    required: true,
+    typeOptions: {
+      multipleValues: false,
+    },
+    displayOptions: {
+      show: {
+        resource: ['shipments'],
+        operation: ['uploadInvoiceForShipment'],
       },
     },
   },
 ];
+
