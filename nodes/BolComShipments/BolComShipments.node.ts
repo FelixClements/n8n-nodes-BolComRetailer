@@ -25,7 +25,7 @@ export class BolComShipments implements INodeType {
       baseURL: 'https://api.bol.com/retailer-demo',
       headers: {
         'Accept': 'application/vnd.retailer.v10+json',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/vnd.retailer.v10+json',
       },
     },
     properties: [

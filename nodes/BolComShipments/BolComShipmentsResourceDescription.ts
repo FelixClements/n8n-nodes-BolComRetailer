@@ -31,15 +31,23 @@ export const bolcomShipmentsResourceOperations: INodeProperties[] = [
       {
         name: 'Create Shipment',
         value: 'createShipment',
-        description: 'Create a shipment for one or more order items',
+        description: 'Create a shipment for one item',
         routing: {
           request: {
             method: 'POST',
             url: '/shipments',
             body: {
-              orderId: '={{ $parameter["orderId"] }}',
-              transporterCode: '={{ $parameter["transporterCode"] }}',
-              trackAndTraceCode: '={{ $parameter["trackAndTraceCode"] }}',
+							orderItems: [
+								{
+									orderItemId: '={{ $parameter["orderItemId"] }}',
+									quantity: '={{ $parameter["quantity"] }}',
+								}
+							],
+							transport:
+								{
+									transporterCode: '={{ $parameter["transporterCode"] }}',
+									trackAndTrace: '={{ $parameter["trackAndTrace"] }}',
+								}
             },
             headers: {
               'Authorization': '=Bearer {{$credentials.bolComOAuth2Api.accessToken}}'
@@ -68,7 +76,7 @@ export const bolcomShipmentsResourceOperations: INodeProperties[] = [
         action: 'Retrieve a list of invoice requests',
       },
       {
-        name: 'Get Shipment',
+        name: 'Get Shipment By Shipment ID',
         value: 'getShipment',
         description: 'Retrieve a shipment by its shipment ID',
         routing: {
@@ -133,7 +141,7 @@ export const bolcomShipmentsResourceFields: INodeProperties[] = [
   /* -------------------------------------------------------------------------- */
   {
     displayName: 'Order ID',
-    name: 'orderId',
+    name: 'orderItemId',
     type: 'string',
     default: '',
     description: 'The ID of the order for which to create a shipment',
@@ -151,6 +159,7 @@ export const bolcomShipmentsResourceFields: INodeProperties[] = [
     type: 'string',
     default: '',
     description: 'The code of the transporter (only required if shipping without a purchased label)',
+		required: true,
     displayOptions: {
       show: {
         resource: ['shipments'],
@@ -160,10 +169,37 @@ export const bolcomShipmentsResourceFields: INodeProperties[] = [
   },
   {
     displayName: 'Track and Trace Code',
-    name: 'trackAndTraceCode',
+    name: 'trackAndTrace',
     type: 'string',
     default: '',
     description: 'The track and trace code provided by the transporter',
+    displayOptions: {
+      show: {
+        resource: ['shipments'],
+        operation: ['createShipment'],
+      },
+    },
+  },
+	{
+    displayName: 'Shipping Label ID Code',
+    name: 'shippingLabelId',
+    type: 'string',
+    default: '',
+    description: 'The Shipping Label ID code provided by the transporter',
+    displayOptions: {
+      show: {
+        resource: ['shipments'],
+        operation: ['createShipment'],
+      },
+    },
+  },
+	{
+    displayName: 'Quantity of Items Shipped',
+    name: 'quantity',
+    type: 'string',
+    default: '',
+    description: 'The quantity of items in the Shipmend',
+		required: true,
     displayOptions: {
       show: {
         resource: ['shipments'],
